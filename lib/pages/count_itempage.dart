@@ -1,6 +1,13 @@
 // import 'dart:ffi';
 
 import 'package:countify/providers/count_provider.dart';
+import 'package:countify/widgets/big_plus_button_style.dart';
+import 'package:countify/widgets/classic_style.dart';
+import 'package:countify/widgets/default_style.dart';
+import 'package:countify/widgets/ergonomic_style.dart';
+import 'package:countify/widgets/ergonomic_with_thumb_rest_style.dart';
+import 'package:countify/widgets/flip_tally_style.dart';
+import 'package:countify/widgets/futuristic_style.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +21,27 @@ class ItemCountPage extends StatefulWidget {
 class _ItemCountPageState extends State<ItemCountPage> {
   TextEditingController countController = TextEditingController();
   TextEditingController countValueController = TextEditingController();
+
+  Widget getBody(String styleName, CounterItem item, int theIndex) {
+    switch (styleName) {
+      case "bigPlusButtonStyle":
+        return BigPlusButtonStyle(item: item, index: theIndex);
+      case "classicStyle":
+        return ClassicStyle(item: item, index: theIndex);
+      case "ergonomicStyle":
+        return ErgonomicStyle(item: item, index: theIndex);
+      case "ergonomicWithThumbRestStyle":
+        return ErgonomicWithThumbRestStyle(item: item, index: theIndex);
+      case "default":
+        return DefaultStyle(item: item, index: theIndex);
+      case "flipTallyStyle":
+        return FlipTallyStyle(item: item, index: theIndex);
+      case "futuristicStyle":
+        return FuturisticStyle(item: item, index: theIndex);
+      default:
+        return DefaultStyle(item: item, index: theIndex);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,115 +90,13 @@ class _ItemCountPageState extends State<ItemCountPage> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, "/edit_count");
+              Navigator.pushNamed(context, "/edit_count", arguments: index);
             },
             icon: Icon(Icons.more_horiz),
           ),
         ],
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (dialogContext) {
-                      return AlertDialog(
-                        title: Text("Set Value"),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text("set the initial number of your count"),
-                            TextField(
-                              keyboardType: TextInputType.number,
-                              controller: countValueController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              int? initialValue = int.tryParse(
-                                countValueController.text,
-                              );
-
-                              if (initialValue != null) {
-                                context.read<CountProvider>().setInitialValue(
-                                  initialValue,
-                                  index,
-                                );
-                                Navigator.pop(dialogContext);
-                                countValueController.clear();
-                              }
-                            },
-                            child: Text("Set"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(dialogContext);
-                            },
-                            child: Text("Close"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 100,
-                  decoration: BoxDecoration(color: Colors.yellow),
-                  child: Center(
-                    child: Text(
-                      context
-                          .watch<CountProvider>()
-                          .items[index]
-                          .value
-                          .toString(),
-                      style: TextStyle(
-                        color: context.watch<CountProvider>().getItemColor(
-                          index,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      context.read<CountProvider>().decrementCount(index);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(color: Colors.purple),
-                      child: Icon(Icons.remove),
-                    ),
-                  ),
-                  SizedBox(width: 20),
-                  GestureDetector(
-                    onTap: () {
-                      context.read<CountProvider>().incrementCount(index);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(color: Colors.purple),
-                      child: Icon(Icons.add),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+      body: getBody(counterItem.counterStyle, counterItem, index),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, '/settings');

@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:audioplayers/audioplayers.dart';
+import 'package:countify/widgets/sound_picker_dialog.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,30 +10,65 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CounterItem {
   String name;
   int value;
-  int? maxLimit; // Optional max
-  int? minLimit; // Optional min
+  int maxLimit; // Optional max
+  int minLimit; // Optional min
+  String alertSound;
+  String minusSound;
+  String plusSound;
+  bool isMinAlertEnabled;
+  bool isMaxAlertEnabled;
+  String counterStyle;
 
   CounterItem({
     required this.name,
     this.value = 0,
-    this.maxLimit,
-    this.minLimit,
+    this.maxLimit = 0,
+    this.minLimit = 0,
+    this.alertSound = "Default",
+    this.minusSound = "Default",
+    this.plusSound = "Default",
+    this.isMinAlertEnabled = false,
+    this.isMaxAlertEnabled = false,
+    this.counterStyle = "futuristicStyle",
   });
 
   // Convert Object to Map
   Map<String, dynamic> toMap() {
-    return {'name': name, 'value': value};
+    return {
+      'name': name,
+      'value': value,
+      'maxLimit': maxLimit,
+      'minLimit': minLimit,
+      'alertSound': alertSound,
+      'minusSound': minusSound,
+      'plusSound': plusSound,
+      'isMinAlertEnabled': isMinAlertEnabled,
+      'isMaxAlertEnabled': isMaxAlertEnabled,
+      'counterStyle': counterStyle,
+    };
   }
 
   // Create Object from Map
   factory CounterItem.fromMap(Map<String, dynamic> map) {
-    return CounterItem(name: map['name'], value: map['value']);
+    return CounterItem(
+      name: map['name'] ?? '',
+      value: map['value'] ?? 0,
+      maxLimit: map['maxLimit'] ?? 0,
+      minLimit: map['minLimit'] ?? 0,
+      alertSound: map['alertSound'] ?? '',
+      minusSound: map['minusSound'] ?? '',
+      plusSound: map['plusSound'] ?? '',
+      isMinAlertEnabled: map['isMinAlertEnabled'] ?? false,
+      isMaxAlertEnabled: map['isMaxAlertEnabled'] ?? false,
+      counterStyle: map['counterStyle'] ?? '',
+    );
   }
 }
 
 class CountProvider extends ChangeNotifier {
   // Start with an empty list of our new Class
   List<CounterItem> _items = [];
+  final AudioPlayer _player = AudioPlayer();
 
   List<CounterItem> get items => _items;
 
@@ -62,9 +100,15 @@ class CountProvider extends ChangeNotifier {
 
   void incrementCount(int index) {
     _items[index].value++;
-    if (_items[index].maxLimit != null &&
+
+    if (_items[index].isMaxAlertEnabled &&
         _items[index].value == _items[index].maxLimit) {
       HapticFeedback.vibrate(); // Vibrate the phone
+      _player.stop();
+      _player.play(AssetSource(soundEffects[items[index].alertSound]!));
+    } else {
+      _player.stop();
+      _player.play(AssetSource(soundEffects[items[index].plusSound]!));
     }
     _saveToPrefs();
     notifyListeners();
@@ -72,9 +116,15 @@ class CountProvider extends ChangeNotifier {
 
   void decrementCount(int index) {
     _items[index].value--;
-    if (_items[index].minLimit != null &&
+
+    if (_items[index].isMinAlertEnabled &&
         _items[index].value == _items[index].minLimit) {
+      _player.stop();
+      _player.play(AssetSource(soundEffects[items[index].alertSound]!));
       HapticFeedback.vibrate(); // Vibrate the phone
+    } else {
+      _player.stop();
+      _player.play(AssetSource(soundEffects[items[index].minusSound]!));
     }
     _saveToPrefs();
     notifyListeners();
@@ -102,10 +152,10 @@ class CountProvider extends ChangeNotifier {
     final item = _items[index];
 
     // Logic remains the same, but it's now centralized
-    if (item.maxLimit != null && item.value >= item.maxLimit!) {
+    if (item.maxLimit != 0 && item.value >= item.maxLimit) {
       return Colors.red;
     }
-    if (item.minLimit != null && item.value <= item.minLimit!) {
+    if (item.minLimit != 0 && item.value <= item.minLimit) {
       return Colors.green;
     }
     return Colors.white; // Default
@@ -113,14 +163,40 @@ class CountProvider extends ChangeNotifier {
 
   void sortItems() async {}
 
-  void setMinValue(int minValue, int index){
+  void setMinAlertState(int index, bool enabled, int minValue) {
+    _items[index].isMinAlertEnabled = enabled;
     _items[index].minLimit = minValue;
     _saveToPrefs();
     notifyListeners();
   }
 
-  void setMaxValue(int maxValue, int index){
+  void setMaxAlertState(int index, bool enabled, int maxValue) {
+    _items[index].isMaxAlertEnabled = enabled;
     _items[index].maxLimit = maxValue;
+    _saveToPrefs();
+    notifyListeners();
+  }
+
+  void setAlertSound(String soundName, int index) {
+    _items[index].alertSound = soundName;
+    _saveToPrefs();
+    notifyListeners();
+  }
+
+  void setPlusSound(String soundName, int index) {
+    _items[index].plusSound = soundName;
+    _saveToPrefs();
+    notifyListeners();
+  }
+
+  void setMinusSound(String soundName, int index) {
+    _items[index].minusSound = soundName;
+    _saveToPrefs();
+    notifyListeners();
+  }
+
+  void setCounterStyle(String styleName, int index) {
+    _items[index].counterStyle = styleName;
     _saveToPrefs();
     notifyListeners();
   }
