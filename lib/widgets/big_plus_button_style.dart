@@ -12,6 +12,32 @@ class BigPlusButtonStyle extends StatelessWidget {
     required this.index,
   });
 
+  Widget _buildMetalButton(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.grey[400],
+          gradient: LinearGradient(
+            colors: [Colors.grey[300]!, Colors.grey[600]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.5),
+              offset: const Offset(2, 2),
+              blurRadius: 4,
+            ),
+          ],
+        ),
+        child: Icon(icon, color: Colors.black87),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController countValueController = TextEditingController(
@@ -92,17 +118,21 @@ class BigPlusButtonStyle extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              GestureDetector(
-                onTap: () {
-                  context.read<CountProvider>().decrementCount(index);
-                },
-                child: Container(
-                  height: 100,
-                  width: 60,
-                  color: Colors.blueGrey,
-                  child: Icon(Icons.remove),
-                ),
+              _buildMetalButton(
+                Icons.remove,
+                () => context.read<CountProvider>().decrementCount(index),
               ),
+              // GestureDetector(
+              //   onTap: () {
+              //     context.read<CountProvider>().decrementCount(index);
+              //   },
+              //   child: Container(
+              //     height: 100,
+              //     width: 60,
+              //     color: Colors.blueGrey,
+              //     child: Icon(Icons.remove),
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 10),

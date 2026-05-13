@@ -1,4 +1,5 @@
 import 'package:countify/providers/count_provider.dart';
+import 'package:countify/providers/setting_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,10 +16,104 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leading: IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
+        leading: IconButton(
+          onPressed: () {
+            if (context.read<CountProvider>().items.isNotEmpty) {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("Delete All"),
+                    content: const Text(
+                      "are you sure you want to delete all items?,this action cannot be undone",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context.read<CountProvider>().clearAll();
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Delete"),
+                      ),
+                    ],
+                  );
+                },
+              );
+            } else {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("No Items"),
+                    content: const Text("there are no items to delete"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Close"),
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
+          },
+          icon: Icon(Icons.delete),
+        ),
         title: Text("Count list"),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.swap_vert)),
+          IconButton(
+            icon: const Icon(Icons.swap_vert),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.sort_by_alpha),
+                      title: const Text("Sort by Name"),
+                      onTap: () {
+                        context.read<CountProvider>().toggleSort(SortType.name);
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.numbers),
+                      title: const Text("Sort by Value"),
+                      onTap: () {
+                        context.read<CountProvider>().toggleSort(
+                          SortType.value,
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.calendar_today),
+                      title: const Text("Sort by Date Created"),
+                      onTap: () {
+                        context.read<CountProvider>().toggleSort(SortType.date);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          IconButton(
+            onPressed: () {
+              context.read<SettingsProvider>().switchTheme(
+                !context.read<SettingsProvider>().isDarkThemeEnabled,
+              );
+            },
+            icon: context.watch<SettingsProvider>().isDarkThemeEnabled
+                ? Icon(Icons.dark_mode)
+                : Icon(Icons.light_mode),
+          ),
           IconButton(
             onPressed: () {
               showDialog(
@@ -26,6 +121,7 @@ class _HomepageState extends State<Homepage> {
                 builder: (context) {
                   TextEditingController countTextController =
                       TextEditingController();
+
                   return AlertDialog(
                     title: TextField(
                       controller: countTextController,
@@ -37,10 +133,20 @@ class _HomepageState extends State<Homepage> {
                     actions: [
                       TextButton(
                         onPressed: () {
+                          final defaultCounterSound = context
+                              .read<SettingsProvider>()
+                              .defaultSounds;
+                          final defaultCounterStyle = context
+                              .read<SettingsProvider>()
+                              .defaultCounterStyle;
                           String newItemName = countTextController.text.trim();
 
                           if (newItemName.isNotEmpty) {
-                            context.read<CountProvider>().addItem(newItemName);
+                            context.read<CountProvider>().addItem(
+                              newItemName,
+                              defaultSound: defaultCounterSound,
+                              defaultCounterStyle: defaultCounterStyle,
+                            );
                           }
 
                           Navigator.pop(context);
@@ -87,9 +193,11 @@ class _HomepageState extends State<Homepage> {
             ),
             onDismissed: (direction) {
               // Logic to remove the item from your list goes here later
-              print(
-                "${context.watch<CountProvider>().items[index].name} deleted",
-              );
+              String msg = "${context.watch<CountProvider>().items[index].name} deleted";
+              context.read<CountProvider>().deleteItem(index);
+              SnackBar(content: Text(msg));
+              
+              
             },
             child: ListTile(
               onTap: () {

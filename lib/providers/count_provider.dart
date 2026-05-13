@@ -1,10 +1,12 @@
 import 'dart:convert';
-
 import 'package:audioplayers/audioplayers.dart';
+import 'package:countify/providers/setting_provider.dart';
+import 'package:countify/utils/url_helper.dart';
 import 'package:countify/widgets/sound_picker_dialog.dart';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CounterItem {
@@ -18,19 +20,21 @@ class CounterItem {
   bool isMinAlertEnabled;
   bool isMaxAlertEnabled;
   String counterStyle;
+  final DateTime createdAt;
 
   CounterItem({
     required this.name,
     this.value = 0,
     this.maxLimit = 0,
     this.minLimit = 0,
-    this.alertSound = "Default",
-    this.minusSound = "Default",
-    this.plusSound = "Default",
+    this.alertSound = "",
+    this.minusSound = "",
+    this.plusSound = "",
     this.isMinAlertEnabled = false,
     this.isMaxAlertEnabled = false,
-    this.counterStyle = "futuristicStyle",
-  });
+    this.counterStyle = "",
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   // Convert Object to Map
   Map<String, dynamic> toMap() {
@@ -45,6 +49,8 @@ class CounterItem {
       'isMinAlertEnabled': isMinAlertEnabled,
       'isMaxAlertEnabled': isMaxAlertEnabled,
       'counterStyle': counterStyle,
+      'createdAt': createdAt
+          .toIso8601String(), // to covert datetime object to string
     };
   }
 
@@ -61,14 +67,33 @@ class CounterItem {
       isMinAlertEnabled: map['isMinAlertEnabled'] ?? false,
       isMaxAlertEnabled: map['isMaxAlertEnabled'] ?? false,
       counterStyle: map['counterStyle'] ?? '',
+      createdAt: map['createdAt'] != null
+          ? DateTime.parse(map['craetedAt'])
+          : DateTime.now(),
     );
   }
 }
 
+enum SortType { name, value, date }
+
 class CountProvider extends ChangeNotifier {
   // Start with an empty list of our new Class
   List<CounterItem> _items = [];
+  int _sessionCount = 0;
+  int _totalClicks = 0;
+  bool _hasReviewed = false;
+  SortType _currentSort = SortType.date;
+  bool _isAscending = true;
+
   final AudioPlayer _player = AudioPlayer();
+  final FlutterTts _tts = FlutterTts();
+  // 1. Create a reference to the other provider
+  late SettingsProvider _settings;
+  // 2. Create an update method (this is what MultiProvider will call)
+  void update(SettingsProvider newSettings) {
+    _settings = newSettings;
+    // No need for notifyListeners() here usually
+  }
 
   List<CounterItem> get items => _items;
 
@@ -88,44 +113,89 @@ class CountProvider extends ChangeNotifier {
     if (jsonString != null) {
       List<dynamic> decodedList = jsonDecode(jsonString);
       _items = decodedList.map((item) => CounterItem.fromMap(item)).toList();
-      notifyListeners();
     }
+
+    _sessionCount = prefs.getInt("session_count") ?? 0;
+    _sessionCount++;
+    await prefs.setInt("session_count", _sessionCount);
+    _totalClicks = prefs.getInt("total_clicks") ?? 0;
+    _hasReviewed = prefs.getBool("has_reviewed") ?? false;
   }
 
-  void addItem(String name) async {
-    _items.add(CounterItem(name: name));
+  void addItem(
+    String name, {
+    required String defaultSound,
+    required String defaultCounterStyle,
+  }) async {
+    _items.add(
+      CounterItem(
+        name: name,
+        alertSound: defaultSound,
+        plusSound: defaultSound,
+        minusSound: defaultSound,
+        counterStyle: defaultCounterStyle,
+      ),
+    );
+
     _saveToPrefs();
     notifyListeners();
   }
 
-  void incrementCount(int index) {
+  Future<void> incrementCount(int index) async {
     _items[index].value++;
 
     if (_items[index].isMaxAlertEnabled &&
         _items[index].value == _items[index].maxLimit) {
-      HapticFeedback.vibrate(); // Vibrate the phone
-      _player.stop();
-      _player.play(AssetSource(soundEffects[items[index].alertSound]!));
+      if (_settings.isSoundEnabled) {
+        _player.stop();
+        _player.play(AssetSource(soundEffects[items[index].alertSound]!));
+      }
+      if (_settings.isHepticsEnabled) {
+        HapticFeedback.vibrate();
+      }
     } else {
-      _player.stop();
-      _player.play(AssetSource(soundEffects[items[index].plusSound]!));
+      if (_settings.isSoundEnabled) {
+        _player.stop();
+        _player.play(AssetSource(soundEffects[items[index].plusSound]!));
+      }
+
+      if (_settings.isHepticsEnabled) {
+        HapticFeedback.selectionClick();
+      }
     }
+    if (_settings.readNumbers && !kIsWeb) {
+      _tts.speak(_items[index].value.toString());
+    }
+    recordAction();
     _saveToPrefs();
     notifyListeners();
   }
 
-  void decrementCount(int index) {
+  Future<void> decrementCount(int index) async {
     _items[index].value--;
 
     if (_items[index].isMinAlertEnabled &&
         _items[index].value == _items[index].minLimit) {
-      _player.stop();
-      _player.play(AssetSource(soundEffects[items[index].alertSound]!));
-      HapticFeedback.vibrate(); // Vibrate the phone
+      if (_settings.isSoundEnabled) {
+        _player.stop();
+        _player.play(AssetSource(soundEffects[items[index].alertSound]!));
+      }
+      if (_settings.isHepticsEnabled) {
+        HapticFeedback.vibrate();
+      }
     } else {
-      _player.stop();
-      _player.play(AssetSource(soundEffects[items[index].minusSound]!));
+      if (_settings.isSoundEnabled) {
+        _player.stop();
+        _player.play(AssetSource(soundEffects[items[index].minusSound]!));
+      }
+      if (_settings.isHepticsEnabled) {
+        HapticFeedback.selectionClick();
+      }
     }
+    if (_settings.readNumbers && !kIsWeb) {
+      _tts.speak(_items[index].value.toString());
+    }
+    recordAction();
     _saveToPrefs();
     notifyListeners();
   }
@@ -198,6 +268,61 @@ class CountProvider extends ChangeNotifier {
   void setCounterStyle(String styleName, int index) {
     _items[index].counterStyle = styleName;
     _saveToPrefs();
+    notifyListeners();
+  }
+
+  void clearAll() {
+    _items.clear();
+
+    notifyListeners();
+  }
+
+  Future<void> resetAll() async {
+    _items.clear();
+    await _saveToPrefs();
+    await _settings.resetAllSettingsToDefault();
+    notifyListeners();
+  }
+
+  void recordAction() async {
+    if (_hasReviewed) return;
+
+    _totalClicks++;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt("total_clicks", _totalClicks);
+
+    if (_sessionCount >= 5 && _totalClicks == 20) {
+      await UrlHelper.requestInAppReview();
+      _hasReviewed = true;
+      await prefs.setBool("has_reviewed", true);
+    }
+  }
+
+  void _applySort() {
+    switch (_currentSort) {
+      case SortType.name:
+        _items.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case SortType.value:
+        _items.sort((a, b) => a.value.compareTo(b.value));
+        break;
+      case SortType.date:
+        _items.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        break;
+    }
+    if (!_isAscending) {
+      _items = _items.reversed.toList();
+    }
+  }
+
+  void toggleSort(SortType type) {
+    if (_currentSort == type) {
+      _isAscending = !_isAscending; // Reverse direction if same type clicked
+    } else {
+      _currentSort = type;
+      _isAscending = true;
+    }
+    _applySort();
     notifyListeners();
   }
 }

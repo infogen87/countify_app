@@ -90,6 +90,28 @@ class _ItemCountPageState extends State<ItemCountPage> {
         actions: [
           IconButton(
             onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("Quick Tip"),
+                    content: const Text(
+                      "click on the number to set the initial value.",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text("close"),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            icon: Icon(Icons.lightbulb_outline),
+          ),
+          IconButton(
+            onPressed: () {
               Navigator.pushNamed(context, "/edit_count", arguments: index);
             },
             icon: Icon(Icons.more_horiz),

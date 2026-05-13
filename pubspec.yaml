@@ -37,6 +37,10 @@ dependencies:
   provider: 
   shared_preferences: ^2.5.5
   audioplayers: ^5.2.1
+  flutter_tts:
+  wakelock_plus: ^1.1.4 
+  url_launcher: ^6.3.2
+  in_app_review: ^2.0.11
 
 dev_dependencies:
   flutter_test:

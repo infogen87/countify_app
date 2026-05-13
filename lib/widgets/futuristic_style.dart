@@ -44,6 +44,9 @@ class FuturisticStyle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController countValueController = TextEditingController(
+      text: item.value.toString(),
+    );
     return Container(
       decoration: const BoxDecoration(
         gradient: RadialGradient(
@@ -55,18 +58,68 @@ class FuturisticStyle extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Glowing Number
-          Text(
-            item.value.toString(),
-            style: TextStyle(
-              fontSize: 120,
-              color: Colors.cyanAccent,
-              fontWeight: FontWeight.w100,
-              shadows: [
-                Shadow(
-                  blurRadius: 20,
-                  color: Colors.cyanAccent.withValues(alpha: 0.8),
-                ),
-              ],
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (dialogContext) {
+                  return AlertDialog(
+                    title: Text("Set Value"),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("set the initial number of your count"),
+                        TextField(
+                          keyboardType: TextInputType.number,
+                          controller: countValueController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          int? newValue = int.tryParse(
+                            countValueController.text,
+                          );
+
+                          if (newValue != null) {
+                            context.read<CountProvider>().setInitialValue(
+                              newValue,
+                              index,
+                            );
+                            Navigator.pop(dialogContext);
+                            countValueController.clear();
+                          }
+                        },
+                        child: Text("Set"),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                        },
+                        child: Text("Close"),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: Text(
+              item.value.toString(),
+              style: TextStyle(
+                fontSize: 120,
+                color: Colors.cyanAccent,
+                fontWeight: FontWeight.w100,
+                shadows: [
+                  Shadow(
+                    blurRadius: 20,
+                    color: Colors.cyanAccent.withValues(alpha: 0.8),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 40),

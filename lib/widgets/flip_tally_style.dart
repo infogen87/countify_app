@@ -37,7 +37,9 @@ class FlipTallyStyle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Inside your FlipTallyStyle StatelessWidget
+    final TextEditingController countValueController = TextEditingController(
+      text: item.value.toString(),
+    );
     return Container(
       color: const Color(0xFF1A1A1A), // Dark Background
       child: Center(
@@ -55,13 +57,63 @@ class FlipTallyStyle extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Text(
-                    item.value.toString().padLeft(3, '0'), // 001, 002...
-                    style: const TextStyle(
-                      fontSize: 100,
-                      color: Colors.white,
-                      fontFamily: 'Courier', // Or any Monospace font
-                      fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (dialogContext) {
+                          return AlertDialog(
+                            title: Text("Set Value"),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text("set the initial number of your count"),
+                                TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller: countValueController,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  int? newValue = int.tryParse(
+                                    countValueController.text,
+                                  );
+
+                                  if (newValue != null) {
+                                    context
+                                        .read<CountProvider>()
+                                        .setInitialValue(newValue, index);
+                                    Navigator.pop(dialogContext);
+                                    countValueController.clear();
+                                  }
+                                },
+                                child: Text("Set"),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(dialogContext);
+                                },
+                                child: Text("Close"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Text(
+                      item.value.toString(),
+                      // item.value.toString().padLeft(3, '0'), // 001, 002...
+                      style: const TextStyle(
+                        fontSize: 100,
+                        color: Colors.white,
+                        fontFamily: 'Courier', // Or any Monospace font
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   // The "Flip" Line

@@ -4,8 +4,6 @@ import 'package:countify/widgets/sound_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
-
 final List<Map<String, String>> counterPageStyles = [
   {'name': 'Big Plus', 'key': 'bigPlusButtonStyle'},
   {'name': 'Classic', 'key': 'classicStyle'},
@@ -141,37 +139,48 @@ class EditCountPage extends StatelessWidget {
                             itemCount: counterPageStyles.length,
                             itemBuilder: (context, indexStyle) {
                               final style = counterPageStyles[indexStyle];
-                              final isSelected = counterItem.counterStyle == style["key"];
+                              final isSelected =
+                                  counterItem.counterStyle == style["key"];
 
                               return GestureDetector(
                                 onTap: () {
-                                  context.read<CountProvider>().setCounterStyle(style["key"]!, index);
+                                  context.read<CountProvider>().setCounterStyle(
+                                    style["key"]!,
+                                    index,
+                                  );
                                   Navigator.pop(sheetContext);
-
                                 },
                                 child: Container(
                                   width: 100,
                                   margin: const EdgeInsets.only(right: 15),
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                      color: isSelected ? Colors.purple : Colors.green,
-                                      width: 2
+                                      color: isSelected
+                                          ? Colors.purple
+                                          : Colors.green,
+                                      width: 2,
                                     ),
-                                    borderRadius: BorderRadius.circular(10)
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.dashboard_customize,
-                                      color: isSelected ? Colors.purple : Colors.green,),
-                                      const SizedBox(height: 10,),
+                                      Icon(
+                                        Icons.dashboard_customize,
+                                        color: isSelected
+                                            ? Colors.purple
+                                            : Colors.green,
+                                      ),
+                                      const SizedBox(height: 10),
                                       Text(
                                         style["name"]!,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          fontWeight: isSelected? FontWeight.bold : FontWeight.normal
+                                          fontWeight: isSelected
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
                                         ),
-                                      )
+                                      ),
                                     ],
                                   ),
                                 ),
