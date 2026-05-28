@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-
-
 class SettingsProvider extends ChangeNotifier {
   SharedPreferences? _prefs;
 
@@ -12,7 +10,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _isSoundEnabled = true;
   String _defaultSounds = "Default";
   bool _readNumbers = false;
-  String _defaultCounterStyle = "bigPlusButtonStyle";
+  String _defaultCounterStyle = "focus Style";
   bool _keepScreenActive = true;
   bool _isDarkThemeEnabled = false;
 
@@ -27,14 +25,14 @@ class SettingsProvider extends ChangeNotifier {
 
   Future<void> loadSettings() async {
     _prefs = await SharedPreferences.getInstance();
-    _isHepticsEnabled = _prefs!.getBool("isHepticsEnabled") ?? true; //done
-    _isSoundEnabled = _prefs!.getBool("isSoundEnabled") ?? true; //done
-    _defaultSounds = _prefs!.getString("defaultSounds") ?? "Default"; //done
-    _readNumbers = _prefs!.getBool("readNumbers") ?? false; //done
+    _isHepticsEnabled = _prefs?.getBool("isHepticsEnabled") ?? true; //done
+    _isSoundEnabled = _prefs?.getBool("isSoundEnabled") ?? true; //done
+    _defaultSounds = _prefs?.getString("defaultSounds") ?? "Default"; //done
+    _readNumbers = _prefs?.getBool("readNumbers") ?? false; //done
     _defaultCounterStyle =
-        _prefs!.getString("defaultCounterStyle") ?? "bigPlusButtonStyle"; //
-    _keepScreenActive = _prefs!.getBool("keepScreenActive") ?? true; //done
-    _isDarkThemeEnabled = _prefs!.getBool("isDarkThemeEnabled") ?? false; //done
+        _prefs!.getString("defaultCounterStyle") ?? "minimal Style"; //
+    _keepScreenActive = _prefs?.getBool("keepScreenActive") ?? true; //done
+    _isDarkThemeEnabled = _prefs?.getBool("isDarkThemeEnabled") ?? false; //done
     WakelockPlus.toggle(enable: _keepScreenActive);
     notifyListeners();
   }

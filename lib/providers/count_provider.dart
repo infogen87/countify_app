@@ -68,7 +68,7 @@ class CounterItem {
       isMaxAlertEnabled: map['isMaxAlertEnabled'] ?? false,
       counterStyle: map['counterStyle'] ?? '',
       createdAt: map['createdAt'] != null
-          ? DateTime.parse(map['craetedAt'])
+          ? DateTime.parse(map['createdAt'])
           : DateTime.now(),
     );
   }
@@ -147,16 +147,16 @@ class CountProvider extends ChangeNotifier {
     if (_items[index].isMaxAlertEnabled &&
         _items[index].value == _items[index].maxLimit) {
       if (_settings.isSoundEnabled) {
-        _player.stop();
-        _player.play(AssetSource(soundEffects[items[index].alertSound]!));
+        await _player.stop();
+        await _player.play(AssetSource(soundEffects[items[index].alertSound]!));
       }
       if (_settings.isHepticsEnabled) {
         HapticFeedback.vibrate();
       }
     } else {
       if (_settings.isSoundEnabled) {
-        _player.stop();
-        _player.play(AssetSource(soundEffects[items[index].plusSound]!));
+        await _player.stop();
+        await _player.play(AssetSource(soundEffects[items[index].plusSound]!));
       }
 
       if (_settings.isHepticsEnabled) {
@@ -177,16 +177,16 @@ class CountProvider extends ChangeNotifier {
     if (_items[index].isMinAlertEnabled &&
         _items[index].value == _items[index].minLimit) {
       if (_settings.isSoundEnabled) {
-        _player.stop();
-        _player.play(AssetSource(soundEffects[items[index].alertSound]!));
+        await _player.stop();
+        await _player.play(AssetSource(soundEffects[items[index].alertSound]!));
       }
       if (_settings.isHepticsEnabled) {
         HapticFeedback.vibrate();
       }
     } else {
       if (_settings.isSoundEnabled) {
-        _player.stop();
-        _player.play(AssetSource(soundEffects[items[index].minusSound]!));
+        await _player.stop();
+        await _player.play(AssetSource(soundEffects[items[index].minusSound]!));
       }
       if (_settings.isHepticsEnabled) {
         HapticFeedback.selectionClick();
@@ -222,12 +222,19 @@ class CountProvider extends ChangeNotifier {
     final item = _items[index];
 
     // Logic remains the same, but it's now centralized
-    if (item.maxLimit != 0 && item.value >= item.maxLimit) {
-      return Colors.red;
+    if ((item.maxLimit != 0 &&
+            item.value >= item.maxLimit &&
+            item.isMaxAlertEnabled) ||
+        (item.minLimit != 0 &&
+            item.value <= item.minLimit &&
+            item.isMinAlertEnabled)) {
+      return const Color.fromARGB(255, 255, 10, 10);
     }
-    if (item.minLimit != 0 && item.value <= item.minLimit) {
-      return Colors.green;
-    }
+    // if (item.minLimit != 0 &&
+    //     item.value <= item.minLimit &&
+    //     item.isMinAlertEnabled) {
+    //   return const Color.fromARGB(255, 255, 10, 10);
+    // }
     return Colors.white; // Default
   }
 

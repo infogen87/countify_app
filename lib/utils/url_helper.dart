@@ -2,7 +2,8 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UrlHelper {
-  static const String _privacyPolicyUrl = 'https://your-actual-policy-link.com';
+  static const String _privacyPolicyUrl =
+      'https://sites.google.com/view/countifyprivacypolicy';
   static final InAppReview _inAppReview = InAppReview.instance;
 
   static Future<void> launchPrivacyPolicy() async {
@@ -25,7 +26,7 @@ class UrlHelper {
 
     if (!await launchUrl(emailLaunchUri)) {
       // If this fails on Web, it's usually because no default mail app is set
-      print('Could not launch email client');
+      // print('Could not launch email client');
     }
   }
 

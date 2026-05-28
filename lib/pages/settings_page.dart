@@ -13,11 +13,15 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
     return Scaffold(
-      appBar: AppBar(title: Text("Settings"), centerTitle: true),
+      appBar: AppBar(
+        title: Text("Settings"),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const Divider(),
+            // const Divider(),
             SwitchListTile(
               value: settings.isHepticsEnabled,
               secondary: const Icon(Icons.vibration),
@@ -26,7 +30,7 @@ class SettingsPage extends StatelessWidget {
                 context.read<SettingsProvider>().toggleHeptics(value);
               },
             ),
-            const Divider(),
+            // const Divider(),
             SwitchListTile(
               value: settings.isSoundEnabled,
               secondary: const Icon(Icons.volume_up),
@@ -35,7 +39,7 @@ class SettingsPage extends StatelessWidget {
                 context.read<SettingsProvider>().toggleSounds(value);
               },
             ),
-            const Divider(),
+            // const Divider(),
             ListTile(
               leading: Icon(Icons.music_note),
               title: Text("Default Sounds"),
@@ -47,7 +51,7 @@ class SettingsPage extends StatelessWidget {
                 );
               },
             ),
-            const Divider(),
+            // const Divider(),
             SwitchListTile(
               value: settings.readNumbers,
               secondary: const Icon(Icons.record_voice_over),
@@ -56,7 +60,7 @@ class SettingsPage extends StatelessWidget {
                 context.read<SettingsProvider>().toggleReadNumbers(value);
               },
             ),
-            const Divider(),
+            // const Divider(),
             ListTile(
               leading: Icon(Icons.dashboard_customize),
               title: Text("Default Counter Style"),
@@ -65,7 +69,7 @@ class SettingsPage extends StatelessWidget {
                 showModalBottomSheet(
                   context: context,
                   builder: (defaultStyleContext) {
-                    final selectedStyle = context
+                    final selectedStyle = defaultStyleContext
                         .watch<SettingsProvider>()
                         .defaultCounterStyle;
                     return Container(
@@ -93,7 +97,7 @@ class SettingsPage extends StatelessWidget {
                                     context
                                         .read<SettingsProvider>()
                                         .setDefaultCounterStyle(style["key"]!);
-                                    Navigator.pop(context);
+                                    // Navigator.pop(context);
                                   },
                                   child: Container(
                                     width: 100,
@@ -101,8 +105,8 @@ class SettingsPage extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       border: Border.all(
                                         color: isSelected
-                                            ? Colors.purple
-                                            : Colors.green,
+                                            ? Color.fromARGB(255, 64, 41, 148)
+                                            : Colors.grey,
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.circular(10),
@@ -111,11 +115,20 @@ class SettingsPage extends StatelessWidget {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Icon(
-                                          Icons.dashboard_customize,
-                                          color: isSelected
-                                              ? Colors.purple
-                                              : Colors.green,
+                                        SizedBox(
+                                          height:
+                                              50, // Bumped slightly from 40 to give the image more breathing room
+                                          width: 50,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ), // Subtle rounding matching your UI style
+                                            child: Image.asset(
+                                              style["image"],
+                                              fit: BoxFit
+                                                  .cover, // FIXED: Prevents squishing and layout overflows
+                                            ),
+                                          ),
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
@@ -141,7 +154,7 @@ class SettingsPage extends StatelessWidget {
                 );
               },
             ),
-            const Divider(),
+            // const Divider(),
             SwitchListTile(
               value: settings.keepScreenActive,
               secondary: const Icon(Icons.lightbulb_outline),
@@ -150,7 +163,7 @@ class SettingsPage extends StatelessWidget {
                 context.read<SettingsProvider>().toggleAlwaysOn(value);
               },
             ),
-            const Divider(),
+            // const Divider(),
             SwitchListTile(
               value: settings.isDarkThemeEnabled,
               secondary: Icon(
@@ -163,14 +176,14 @@ class SettingsPage extends StatelessWidget {
                 context.read<SettingsProvider>().switchTheme(value);
               },
             ),
-            const Divider(),
-            ListTile(
-              leading: Icon(Icons.auto_awesome),
-              title: Text("Upgrade: Ad Free"),
-              trailing: Icon(Icons.chevron_right),
-              onTap: () {},
-            ),
-            const Divider(),
+            // const Divider(),
+            // ListTile(
+            //   leading: Icon(Icons.auto_awesome),
+            //   title: Text("Upgrade: Ad Free"),
+            //   trailing: Icon(Icons.chevron_right),
+            //   onTap: () {},
+            // ),
+            // const Divider(),
             ListTile(
               leading: Icon(Icons.restart_alt),
               title: Text("Reset All"),
@@ -181,20 +194,47 @@ class SettingsPage extends StatelessWidget {
                     return AlertDialog(
                       title: const Text("Reset All"),
                       content: const Text(
-                        "This will delete all counters AND reset your settings to default. This cannot be undone.",
-                        style: TextStyle(color: Colors.red),
+                        "Warning: This deletes all counters and resets your settings to default. This action is permanent.",
                       ),
                       actions: [
                         TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: const Color.fromARGB(
+                              255,
+                              64,
+                              41,
+                              148,
+                            ),
+                          ),
                           onPressed: () => Navigator.pop(context),
-                          child: Text("close"),
+                          child: Text(
+                            "Close",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                         TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: const Color.fromARGB(
+                              255,
+                              255,
+                              10,
+                              10,
+                            ),
+                          ),
                           onPressed: () {
                             context.read<CountProvider>().resetAll();
                             Navigator.pop(context);
                           },
-                          child: Text("Reset"),
+                          child: Text(
+                            "Reset",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     );
@@ -203,7 +243,7 @@ class SettingsPage extends StatelessWidget {
               },
               trailing: Icon(Icons.chevron_right),
             ),
-            const Divider(),
+            // const Divider(),
             ListTile(
               leading: Icon(Icons.star_rate),
               title: Text("Rate The App"),
@@ -211,14 +251,14 @@ class SettingsPage extends StatelessWidget {
               onTap: () => UrlHelper.openPlayStoreForAppReview(),
             ),
 
-            const Divider(),
+            // const Divider(),
             ListTile(
               leading: Icon(Icons.help_outline),
               title: Text("Support"),
               trailing: Icon(Icons.chevron_right),
               onTap: () => UrlHelper.launchSupportEmail(),
             ),
-            const Divider(),
+            // const Divider(),
             ListTile(
               leading: Icon(Icons.gavel),
               title: Text("Privacy Policy"),
@@ -230,4 +270,6 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
+
+  
 }

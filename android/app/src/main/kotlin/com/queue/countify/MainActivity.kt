@@ -1,4 +1,4 @@
-package com.example.countify
+package com.queue.countify
 
 import io.flutter.embedding.android.FlutterActivity
 

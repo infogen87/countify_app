@@ -77,8 +77,16 @@ void setAlertDialogState({
                   }
                   Navigator.pop(dialogContext);
                 },
-                style: TextButton.styleFrom(backgroundColor: Colors.green),
-                child: const Text("Done"),
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 64, 41, 148),
+                ),
+                child: const Text(
+                  "Done",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
           );

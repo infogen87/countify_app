@@ -4,6 +4,7 @@ import 'package:countify/pages/homepage.dart';
 import 'package:countify/pages/settings_page.dart';
 import 'package:countify/providers/count_provider.dart';
 import 'package:countify/providers/setting_provider.dart';
+import 'package:countify/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -50,12 +51,13 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: "countify app",
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.teal,
-              brightness: isDark ? Brightness.dark : Brightness.light,
-            ),
-          ),
+          // theme: ThemeData(
+          //   colorScheme: ColorScheme.fromSeed(
+          //     seedColor: Colors.teal,
+          //     brightness: isDark ? Brightness.dark : Brightness.light,
+          //   ),
+          // ),
+          theme: isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
           routes: {
             '/': (context) => const Homepage(),
             '/settings': (context) => const SettingsPage(),

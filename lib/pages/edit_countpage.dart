@@ -4,14 +4,37 @@ import 'package:countify/widgets/sound_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-final List<Map<String, String>> counterPageStyles = [
-  {'name': 'Big Plus', 'key': 'bigPlusButtonStyle'},
-  {'name': 'Classic', 'key': 'classicStyle'},
-  {'name': 'Ergonomic', 'key': 'ergonomicStyle'},
-  {'name': 'Ergonomic With Thumb', 'key': 'ergonomicWithThumbRestStyle'},
-  {'name': 'Default', 'key': 'default'},
-  {'name': 'Flip Tally', 'key': 'flipTallyStyle'},
-  {'name': 'futuristic', 'key': 'futuristicStyle'},
+final List<Map<String, dynamic>> counterPageStyles = [
+  {
+    'name': 'Focus',
+    'key': 'focus Style',
+    'image': "/images/bigplusStyles.png",
+  },
+  {
+    'name': 'Stacked',
+    'key': 'stacked Style',
+    'image': "/images/countifyCounterStyles.png",
+  },
+  {
+    'name': 'Cascade',
+    'key': 'cascade Style',
+    'image': "/images/enomic.png",
+  },
+  {
+    'name': 'Classic',
+    'key': 'classic Style',
+    'image': "/images/countifyCounterStyles.png",
+  },
+  // {
+  //   'name': 'Flip Tally',
+  //   'key': 'flip Tally Style',
+  //   'image': "assets/images/countifyCounterStyles.png",
+  // },
+  {
+    'name': 'Minimal',
+    'key': 'minimal Style',
+    'image': "assets/images/futuristicStyle.png",
+  },
 ];
 
 class EditCountPage extends StatelessWidget {
@@ -23,7 +46,11 @@ class EditCountPage extends StatelessWidget {
     final counterItem = context.watch<CountProvider>().items[index];
 
     return Scaffold(
-      appBar: AppBar(title: Text("edit count"), centerTitle: true),
+      appBar: AppBar(
+        title: Text("edit count"),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: ListView(
         children: [
           ListTile(
@@ -46,8 +73,8 @@ class EditCountPage extends StatelessWidget {
               );
             },
           ),
-          const Divider(),
 
+          // const Divider(),
           ListTile(
             leading: Icon(Icons.report_problem_outlined),
             title: Text("Maximum Alert"),
@@ -68,8 +95,8 @@ class EditCountPage extends StatelessWidget {
               );
             },
           ),
-          const Divider(),
 
+          // const Divider(),
           ListTile(
             leading: Icon(Icons.campaign_outlined),
             title: Text("Alert sound"),
@@ -84,8 +111,8 @@ class EditCountPage extends StatelessWidget {
               );
             },
           ),
-          const Divider(),
 
+          // const Divider(),
           ListTile(
             leading: Icon(Icons.campaign_outlined),
             title: Text("Plus sound"),
@@ -100,7 +127,7 @@ class EditCountPage extends StatelessWidget {
               );
             },
           ),
-          const Divider(),
+          // const Divider(),
           ListTile(
             leading: Icon(Icons.campaign_outlined),
             title: Text("Minus sound"),
@@ -115,7 +142,7 @@ class EditCountPage extends StatelessWidget {
               );
             },
           ),
-          const Divider(),
+          // const Divider(),
           ListTile(
             leading: Icon(Icons.palette_outlined),
             title: Text("Counter Style"),
@@ -124,7 +151,11 @@ class EditCountPage extends StatelessWidget {
             onTap: () {
               showModalBottomSheet(
                 context: context,
-                builder: (sheetContext) {
+                builder: (itemCounterStyleContext) {
+                  final selectedStyle = itemCounterStyleContext
+                      .watch<CountProvider>()
+                      .items[index]
+                      .counterStyle;
                   return Container(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -139,8 +170,7 @@ class EditCountPage extends StatelessWidget {
                             itemCount: counterPageStyles.length,
                             itemBuilder: (context, indexStyle) {
                               final style = counterPageStyles[indexStyle];
-                              final isSelected =
-                                  counterItem.counterStyle == style["key"];
+                              final isSelected = selectedStyle == style["key"];
 
                               return GestureDetector(
                                 onTap: () {
@@ -148,7 +178,7 @@ class EditCountPage extends StatelessWidget {
                                     style["key"]!,
                                     index,
                                   );
-                                  Navigator.pop(sheetContext);
+                                  // Navigator.pop(sheetContext);
                                 },
                                 child: Container(
                                   width: 100,
@@ -156,8 +186,8 @@ class EditCountPage extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     border: Border.all(
                                       color: isSelected
-                                          ? Colors.purple
-                                          : Colors.green,
+                                          ? Color.fromARGB(255, 64, 41, 148)
+                                          : Colors.grey,
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(10),
@@ -165,12 +195,22 @@ class EditCountPage extends StatelessWidget {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(
-                                        Icons.dashboard_customize,
-                                        color: isSelected
-                                            ? Colors.purple
-                                            : Colors.green,
+                                      SizedBox(
+                                        height:
+                                            60, // Bumped slightly from 40 to give the image more breathing room
+                                        width: 60,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ), // Subtle rounding matching your UI style
+                                          child: Image.asset(
+                                            style["image"],
+                                            fit: BoxFit
+                                                .cover, // FIXED: Prevents squishing and layout overflows
+                                          ),
+                                        ),
                                       ),
+
                                       const SizedBox(height: 10),
                                       Text(
                                         style["name"]!,
@@ -195,7 +235,8 @@ class EditCountPage extends StatelessWidget {
               );
             },
           ),
-          const Divider(),
+          // const Divider(),
+          SizedBox(height: 10),
         ],
       ),
     );

@@ -1,13 +1,12 @@
 // import 'dart:ffi';
 
 import 'package:countify/providers/count_provider.dart';
-import 'package:countify/widgets/big_plus_button_style.dart';
+import 'package:countify/widgets/focus_style.dart';
 import 'package:countify/widgets/classic_style.dart';
-import 'package:countify/widgets/default_style.dart';
-import 'package:countify/widgets/ergonomic_style.dart';
-import 'package:countify/widgets/ergonomic_with_thumb_rest_style.dart';
-import 'package:countify/widgets/flip_tally_style.dart';
-import 'package:countify/widgets/futuristic_style.dart';
+import 'package:countify/widgets/stacked_style.dart';
+import 'package:countify/widgets/cascade_style.dart';
+// import 'package:countify/widgets/flip_tally_style.dart';
+import 'package:countify/widgets/minimal_style.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,22 +23,20 @@ class _ItemCountPageState extends State<ItemCountPage> {
 
   Widget getBody(String styleName, CounterItem item, int theIndex) {
     switch (styleName) {
-      case "bigPlusButtonStyle":
-        return BigPlusButtonStyle(item: item, index: theIndex);
-      case "classicStyle":
+      case "focus Style":
+        return FocusStyle(item: item, index: theIndex);
+      case "stacked Style":
+        return StackedStyle(item: item, index: theIndex);
+      case "cascade Style":
+        return CascadeStyle(item: item, index: theIndex);
+      case "classic Style":
         return ClassicStyle(item: item, index: theIndex);
-      case "ergonomicStyle":
-        return ErgonomicStyle(item: item, index: theIndex);
-      case "ergonomicWithThumbRestStyle":
-        return ErgonomicWithThumbRestStyle(item: item, index: theIndex);
-      case "default":
-        return DefaultStyle(item: item, index: theIndex);
-      case "flipTallyStyle":
-        return FlipTallyStyle(item: item, index: theIndex);
-      case "futuristicStyle":
-        return FuturisticStyle(item: item, index: theIndex);
+      // case "flip Tally Style":
+      //   return FlipTallyStyle(item: item, index: theIndex);
+      case "minimal Style":
+        return MinimalStyle(item: item, index: theIndex);
       default:
-        return DefaultStyle(item: item, index: theIndex);
+        return ClassicStyle(item: item, index: theIndex);
     }
   }
 
@@ -51,7 +48,7 @@ class _ItemCountPageState extends State<ItemCountPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.purple,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
@@ -66,11 +63,13 @@ class _ItemCountPageState extends State<ItemCountPage> {
 
             decoration: InputDecoration(
               hintText: "edit ${counterItem.name}...",
-              hintStyle: TextStyle(color: Colors.blueGrey),
-              border: InputBorder.none,
+              hintStyle: TextStyle(color: Colors.grey[700]),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
               // border: OutlineInputBorder(),
-              fillColor: Colors.white,
-              filled: true,
+              // fillColor: Colors.white,
+              // filled: true,
             ),
             controller: countController,
             onEditingComplete: () {
@@ -96,12 +95,26 @@ class _ItemCountPageState extends State<ItemCountPage> {
                   return AlertDialog(
                     title: const Text("Quick Tip"),
                     content: const Text(
-                      "click on the number to set the initial value.",
+                      "Click on the number to set it's initial value.",
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text("close"),
+                        style: TextButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            64,
+                            41,
+                            148,
+                          ),
+                        ),
+                        child: Text(
+                          "Ok",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ],
                   );
@@ -117,6 +130,15 @@ class _ItemCountPageState extends State<ItemCountPage> {
             icon: Icon(Icons.more_horiz),
           ),
         ],
+        // flexibleSpace: Container(
+        //   decoration: BoxDecoration(
+        //     gradient: LinearGradient(
+        //       end: Alignment.bottomCenter,
+        //       begin: Alignment.bottomRight,
+        //       colors: [Color(0xFFF2994A), Color(0xFFF2C94C)],
+        //     ),
+        //   ),
+        // ),
       ),
       body: getBody(counterItem.counterStyle, counterItem, index),
       floatingActionButton: FloatingActionButton(

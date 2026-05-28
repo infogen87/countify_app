@@ -1,6 +1,7 @@
 import 'package:countify/providers/count_provider.dart';
 import 'package:countify/providers/setting_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class Homepage extends StatefulWidget {
@@ -13,9 +14,24 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
+    Widget emptyContent = Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.inventory_2_outlined, size: 80, color: Colors.grey),
+          const SizedBox(height: 16),
+          Text(
+            "No items added yet",
+            style: TextStyle(color: Colors.grey[600], fontSize: 18),
+          ),
+        ],
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
           onPressed: () {
             if (context.read<CountProvider>().items.isNotEmpty) {
@@ -25,19 +41,47 @@ class _HomepageState extends State<Homepage> {
                   return AlertDialog(
                     title: const Text("Delete All"),
                     content: const Text(
-                      "are you sure you want to delete all items?,this action cannot be undone",
+                      "Delete all items? This action cannot be undone.",
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text("Cancel"),
+                        style: TextButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            64,
+                            41,
+                            148,
+                          ),
+                        ),
+                        child: const Text(
+                          "Cancel",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
                           context.read<CountProvider>().clearAll();
                           Navigator.pop(context);
                         },
-                        child: const Text("Delete"),
+                        style: TextButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            255,
+                            10,
+                            10,
+                          ),
+                        ),
+                        child: const Text(
+                          "Delete",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   );
@@ -49,11 +93,25 @@ class _HomepageState extends State<Homepage> {
                 builder: (context) {
                   return AlertDialog(
                     title: const Text("No Items"),
-                    content: const Text("there are no items to delete"),
+                    content: const Text("There are no items to delete"),
                     actions: [
                       TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            64,
+                            41,
+                            148,
+                          ),
+                        ),
                         onPressed: () => Navigator.pop(context),
-                        child: const Text("Close"),
+                        child: const Text(
+                          "Ok",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   );
@@ -61,9 +119,18 @@ class _HomepageState extends State<Homepage> {
               );
             }
           },
-          icon: Icon(Icons.delete),
+          icon: const Icon(Icons.delete),
         ),
-        title: Text("Count list"),
+        title: Text(
+          "Count list",
+          style: GoogleFonts.montserrat(
+            textStyle: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w900, // Makes it a heavy block
+              letterSpacing: -0.5,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.swap_vert),
@@ -111,8 +178,8 @@ class _HomepageState extends State<Homepage> {
               );
             },
             icon: context.watch<SettingsProvider>().isDarkThemeEnabled
-                ? Icon(Icons.dark_mode)
-                : Icon(Icons.light_mode),
+                ? const Icon(Icons.dark_mode)
+                : const Icon(Icons.light_mode),
           ),
           IconButton(
             onPressed: () {
@@ -125,8 +192,8 @@ class _HomepageState extends State<Homepage> {
                   return AlertDialog(
                     title: TextField(
                       controller: countTextController,
-                      decoration: InputDecoration(
-                        hintText: "add new item eg cars...",
+                      decoration: const InputDecoration(
+                        hintText: "Add new item eg rods...",
                         hintStyle: TextStyle(color: Colors.blueGrey),
                       ),
                     ),
@@ -148,106 +215,193 @@ class _HomepageState extends State<Homepage> {
                               defaultCounterStyle: defaultCounterStyle,
                             );
                           }
-
                           Navigator.pop(context);
                         },
-
                         style: TextButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            64,
+                            41,
+                            148,
+                          ),
                         ),
-                        child: Text("add"),
+                        child: const Text(
+                          "Add",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-
+                        onPressed: () => Navigator.pop(context),
                         style: TextButton.styleFrom(
-                          backgroundColor: Colors.red,
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            64,
+                            41,
+                            148,
+                          ),
                         ),
-                        child: Text("close"),
+                        child: const Text(
+                          "Close",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   );
                 },
               );
-              // context.read<CountProvider>().addItem();
             },
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
           ),
         ],
       ),
-      body: ListView.separated(
-        itemCount: context.watch<CountProvider>().items.length,
-        itemBuilder: (context, index) {
-          // final item = myData[index];
+      body: context.watch<CountProvider>().items.isEmpty
+          ? emptyContent
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8,
+              ), // Padding at top and bottom of list
+              itemCount: context.watch<CountProvider>().items.length,
+              itemBuilder: (context, index) {
+                // We grab the item info once per index using watch for the UI elements
+                final currentItem = context.watch<CountProvider>().items[index];
 
-          return Dismissible(
-            key: Key(context.watch<CountProvider>().items[index].name),
-            direction: DismissDirection.endToStart, // Swipe right-to-left
-            background: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 20),
-              color: Colors.red,
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            onDismissed: (direction) {
-              // Logic to remove the item from your list goes here later
-              String msg = "${context.watch<CountProvider>().items[index].name} deleted";
-              context.read<CountProvider>().deleteItem(index);
-              SnackBar(content: Text(msg));
-              
-              
-            },
-            child: ListTile(
-              onTap: () {
-                Navigator.pushNamed(context, "/count_item", arguments: index);
+                return Dismissible(
+                  key: Key(currentItem.name),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 20),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ), // Matches card boundaries
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(
+                        12,
+                      ), // Smooth dismiss corners matching the card
+                    ),
+                    child: const Icon(Icons.delete, color: Colors.white),
+                  ),
+                  onDismissed: (direction) {
+                    String msg = "${currentItem.name} deleted";
+                    context.read<CountProvider>().deleteItem(index);
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(msg)));
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ), // This creates your clean gap
+                    clipBehavior: Clip.antiAlias,
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: ListTile(
+                      visualDensity: VisualDensity(vertical: 4),
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          "/count_item",
+                          arguments: index,
+                        );
+                      },
+                      tileColor: const Color.fromARGB(
+                        255,
+                        64,
+                        41,
+                        148,
+                      ), // Your beautiful old purple
+                      leading: Text(
+                        currentItem.value.toString(),
+                        style: GoogleFonts.inter(
+                          textStyle: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w500,
+                            color: context.watch<CountProvider>().getItemColor(
+                              index,
+                            ),
+                          ),
+                        ),
+                      ),
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "${currentItem.name}${currentItem.value >= currentItem.maxLimit && currentItem.isMaxAlertEnabled
+                                  ? ": Maximum value reached!"
+                                  : currentItem.value <= currentItem.minLimit && currentItem.isMinAlertEnabled
+                                  ? ": Minimum value reached!"
+                                  : ""}",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: IntrinsicHeight(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  context.read<CountProvider>().incrementCount(
+                                    index,
+                                  );
+                                },
+                                icon: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const VerticalDivider(
+                                width: 2,
+                                thickness: 2,
+                                color: Colors.white24,
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  context.read<CountProvider>().decrementCount(
+                                    index,
+                                  );
+                                },
+                                icon: const Icon(
+                                  Icons.remove,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               },
-              tileColor: Colors.purple,
-              leading: Text(
-                context.watch<CountProvider>().items[index].value.toString(),
-                style: TextStyle(
-                  color: context.watch<CountProvider>().getItemColor(index),
-                ),
-              ),
-              title: Text(context.watch<CountProvider>().items[index].name),
-              trailing: IntrinsicHeight(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          context.read<CountProvider>().incrementCount(index);
-                        },
-                        icon: const Icon(Icons.add),
-                      ),
-                      const VerticalDivider(width: 2, thickness: 2),
-                      IconButton(
-                        onPressed: () {
-                          context.read<CountProvider>().decrementCount(index);
-                        },
-                        icon: const Icon(Icons.remove),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
-          );
-        },
-        separatorBuilder: (context, index) =>
-            Divider(color: Colors.white, height: 2, thickness: 2),
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, "/settings");
         },
-        child: Icon(Icons.settings),
+        child: const Icon(Icons.settings),
       ),
     );
   }
