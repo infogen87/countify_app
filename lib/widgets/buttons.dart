@@ -1,3 +1,4 @@
+import 'package:countify/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 class CounterButton extends StatelessWidget {
@@ -13,7 +14,7 @@ class CounterButton extends StatelessWidget {
     required this.onTap,
     required this.height,
     required this.width,
-    required this.isCircular
+    required this.isCircular,
   });
 
   @override
@@ -25,9 +26,9 @@ class CounterButton extends StatelessWidget {
         width: width,
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          shape: isCircular? BoxShape.circle: BoxShape.rectangle,
-          color: const Color.fromARGB(255, 64, 41, 148),
-          borderRadius: isCircular? null : BorderRadius.circular(15),
+          shape: isCircular ? BoxShape.circle : BoxShape.rectangle,
+          color: AppTheme.brandPurple, //const Color.fromARGB(255, 64, 41, 148),
+          borderRadius: isCircular ? null : BorderRadius.circular(15),
         ),
         child: Icon(icon, color: Colors.white, size: 36),
       ),

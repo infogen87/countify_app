@@ -3,7 +3,6 @@
 import 'package:countify/providers/count_provider.dart';
 import 'package:countify/widgets/focus_style.dart';
 import 'package:countify/widgets/classic_style.dart';
-import 'package:countify/widgets/stacked_style.dart';
 import 'package:countify/widgets/cascade_style.dart';
 // import 'package:countify/widgets/flip_tally_style.dart';
 import 'package:countify/widgets/minimal_style.dart';
@@ -25,8 +24,6 @@ class _ItemCountPageState extends State<ItemCountPage> {
     switch (styleName) {
       case "focus Style":
         return FocusStyle(item: item, index: theIndex);
-      case "stacked Style":
-        return StackedStyle(item: item, index: theIndex);
       case "cascade Style":
         return CascadeStyle(item: item, index: theIndex);
       case "classic Style":
@@ -38,6 +35,18 @@ class _ItemCountPageState extends State<ItemCountPage> {
       default:
         return ClassicStyle(item: item, index: theIndex);
     }
+  }
+
+  String showAlert(CounterItem currentItem) {
+    if (currentItem.value >= currentItem.maxLimit &&
+        currentItem.isMaxAlertEnabled) {
+      return "Max value reached!";
+    }
+    if (currentItem.value <= currentItem.minLimit &&
+        currentItem.isMinAlertEnabled) {
+      return "Min value reached!";
+    }
+    return "";
   }
 
   @override
@@ -140,7 +149,42 @@ class _ItemCountPageState extends State<ItemCountPage> {
         //   ),
         // ),
       ),
-      body: getBody(counterItem.counterStyle, counterItem, index),
+      body: Column(
+        children: [
+          Builder(
+            builder: (context) {
+              final message = showAlert(counterItem);
+              if (message.isEmpty) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+
+                  children: [
+                    Icon(
+                      Icons.report_problem_outlined,
+                      color: const Color(0xFF455A64),
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color(0xFF455A64),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          Expanded(
+            child: getBody(counterItem.counterStyle, counterItem, index),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, '/settings');

@@ -143,8 +143,6 @@
 //   }
 // }
 
-
-
 // import 'package:countify/providers/count_provider.dart';
 // import 'package:flutter/material.dart';
 // import 'package:provider/provider.dart';
@@ -270,7 +268,7 @@
 //                       style: const TextStyle(
 //                         fontSize: 100,
 //                         color: Colors.white, // High contrast text match
-//                         fontFamily: 'Courier', 
+//                         fontFamily: 'Courier',
 //                         fontWeight: FontWeight.bold,
 //                       ),
 //                     ),

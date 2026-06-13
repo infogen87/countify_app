@@ -14,14 +14,11 @@ class UrlHelper {
   }
 
   static Future<void> launchSupportEmail() async {
-    // We use the Uri constructor to handle spaces and special characters safely
-    final Uri emailLaunchUri = Uri(
-      scheme: 'mailto',
-      path: 'your-email@example.com', // Replace with your real email
-      queryParameters: {
-        'subject': 'Countify Support Request',
-        'body': 'Hi, I need help with...',
-      },
+    final subject = Uri.encodeComponent('Countify Support Request');
+    final body = Uri.encodeComponent('Hi, I need help with...');
+
+    final Uri emailLaunchUri = Uri.parse(
+      'mailto:uzevie1234@gmail.com?subject=$subject&body=$body',
     );
 
     if (!await launchUrl(emailLaunchUri)) {

@@ -278,9 +278,9 @@ class CountProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void clearAll() {
+  void clearAll() async {
     _items.clear();
-
+    await _saveToPrefs();
     notifyListeners();
   }
 

@@ -23,8 +23,9 @@ class CountValueWidget extends StatelessWidget {
                 int? currentInputValue = int.tryParse(
                   countValueController.text,
                 );
-                bool isOverLimit =
+                bool isOverMaxLimit =
                     currentInputValue != null && currentInputValue > 1000000;
+                bool isOverMinLimit = currentInputValue != null && currentInputValue < -1000000;    
                 return AlertDialog(
                   title: Text("Set Value"),
                   content: Column(
@@ -42,11 +43,22 @@ class CountValueWidget extends StatelessWidget {
                           border: OutlineInputBorder(),
                         ),
                       ),
-                      if (isOverLimit)
-                        Text(
-                          "The initial value can't be greater than 1,000,000",
-                          style: TextStyle(color: Colors.red, fontSize: 13),
+                      if (isOverMaxLimit)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "The initial value can't be greater than 1,000,000",
+                            style: TextStyle(color: Colors.red, fontSize: 13),
+                          ),
                         ),
+                      if (isOverMinLimit)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "The initial value can't be lesser than -1,000,000",
+                            style: TextStyle(color: Colors.red, fontSize: 13),
+                          ),
+                        ),  
                     ],
                   ),
                   actions: [
@@ -57,7 +69,7 @@ class CountValueWidget extends StatelessWidget {
                       onPressed: () {
                         int? newValue = int.tryParse(countValueController.text);
 
-                        if (newValue != null && newValue <= 1000000) {
+                        if (newValue != null && newValue <= 1000000 && newValue >= -1000000) {
                           context.read<CountProvider>().setInitialValue(
                             newValue,
                             index,
@@ -106,7 +118,7 @@ class CountValueWidget extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
         maxLines: 1,
-        minFontSize: 24,           // ← Important: Don't let it get too small
+        minFontSize: 24, // ← Important: Don't let it get too small
         stepGranularity: 2.0,
       ),
     );

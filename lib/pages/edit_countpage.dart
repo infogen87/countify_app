@@ -1,4 +1,5 @@
 import 'package:countify/providers/count_provider.dart';
+import 'package:countify/utils/constants.dart';
 import 'package:countify/widgets/alert_dialog.dart';
 import 'package:countify/widgets/sound_picker_dialog.dart';
 import 'package:flutter/material.dart';
@@ -8,22 +9,22 @@ final List<Map<String, dynamic>> counterPageStyles = [
   {
     'name': 'Focus',
     'key': 'focus Style',
-    'image': "/images/bigplusStyles.png",
+    'image': "assets/images/focusStyle.png",
   },
-  {
-    'name': 'Stacked',
-    'key': 'stacked Style',
-    'image': "/images/countifyCounterStyles.png",
-  },
+  // {
+  //   'name': 'Stacked',
+  //   'key': 'stacked Style',
+  //   'image': "/images/countifyCounterStyles.png",
+  // },
   {
     'name': 'Cascade',
     'key': 'cascade Style',
-    'image': "/images/enomic.png",
+    'image': "assets/images/cascadeStyle.png",
   },
   {
     'name': 'Classic',
     'key': 'classic Style',
-    'image': "/images/countifyCounterStyles.png",
+    'image': "assets/images/CountifyAppIcon.png",
   },
   // {
   //   'name': 'Flip Tally',
@@ -33,7 +34,7 @@ final List<Map<String, dynamic>> counterPageStyles = [
   {
     'name': 'Minimal',
     'key': 'minimal Style',
-    'image': "assets/images/futuristicStyle.png",
+    'image': "assets/images/minimalStyle.png",
   },
 ];
 
@@ -50,6 +51,18 @@ class EditCountPage extends StatelessWidget {
         title: Text("edit count"),
         centerTitle: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        leading: IconButton(
+          onPressed: () {
+            if (context.read<CountProvider>().items.isEmpty) {
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+            } else {
+              Navigator.pop(context);
+            }
+          },
+          icon: Icon(Icons.chevron_left),
+        ),
       ),
       body: ListView(
         children: [
@@ -60,6 +73,7 @@ class EditCountPage extends StatelessWidget {
               counterItem.isMinAlertEnabled
                   ? "min: ${counterItem.minLimit}"
                   : "Off",
+              style: TextStyle(color: Colors.grey[600]),
             ),
             trailing: Icon(Icons.chevron_right),
             onTap: () {
@@ -82,6 +96,7 @@ class EditCountPage extends StatelessWidget {
               counterItem.isMaxAlertEnabled
                   ? "max: ${counterItem.maxLimit}"
                   : "Off",
+              style: TextStyle(color: Colors.grey[600]),
             ),
             trailing: Icon(Icons.chevron_right),
             onTap: () {
@@ -100,7 +115,10 @@ class EditCountPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.campaign_outlined),
             title: Text("Alert sound"),
-            subtitle: Text(counterItem.alertSound),
+            subtitle: Text(
+              counterItem.alertSound,
+              style: TextStyle(color: Colors.grey[600]),
+            ),
             trailing: Icon(Icons.chevron_right),
             onTap: () {
               showSoundPicker(
@@ -116,7 +134,10 @@ class EditCountPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.campaign_outlined),
             title: Text("Plus sound"),
-            subtitle: Text(counterItem.plusSound),
+            subtitle: Text(
+              counterItem.plusSound,
+              style: TextStyle(color: Colors.grey[600]),
+            ),
             trailing: Icon(Icons.chevron_right),
             onTap: () {
               showSoundPicker(
@@ -131,7 +152,10 @@ class EditCountPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.campaign_outlined),
             title: Text("Minus sound"),
-            subtitle: Text(counterItem.minusSound),
+            subtitle: Text(
+              counterItem.minusSound,
+              style: TextStyle(color: Colors.grey[600]),
+            ),
             trailing: Icon(Icons.chevron_right),
             onTap: () {
               showSoundPicker(
@@ -146,89 +170,107 @@ class EditCountPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.palette_outlined),
             title: Text("Counter Style"),
-            subtitle: Text(counterItem.counterStyle),
+            subtitle: Text(
+              counterItem.counterStyle,
+              style: TextStyle(color: Colors.grey[600]),
+            ),
             trailing: Icon(Icons.chevron_right),
             onTap: () {
               showModalBottomSheet(
                 context: context,
+                isScrollControlled: true,
                 builder: (itemCounterStyleContext) {
                   final selectedStyle = itemCounterStyleContext
                       .watch<CountProvider>()
                       .items[index]
                       .counterStyle;
-                  return Container(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text("select counter style", style: TextStyle()),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          height: 150,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: counterPageStyles.length,
-                            itemBuilder: (context, indexStyle) {
-                              final style = counterPageStyles[indexStyle];
-                              final isSelected = selectedStyle == style["key"];
+                  return SafeArea(
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(
+                        20,
+                        20,
+                        20,
+                        30,
+                      ), // Extra bottom padding for breathing room
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "select counter style",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: AppTheme.showModalHeaderSize,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            height: 130,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: counterPageStyles.length,
+                              itemBuilder: (context, indexStyle) {
+                                final style = counterPageStyles[indexStyle];
+                                final isSelected =
+                                    selectedStyle == style["key"];
 
-                              return GestureDetector(
-                                onTap: () {
-                                  context.read<CountProvider>().setCounterStyle(
-                                    style["key"]!,
-                                    index,
-                                  );
-                                  // Navigator.pop(sheetContext);
-                                },
-                                child: Container(
-                                  width: 100,
-                                  margin: const EdgeInsets.only(right: 15),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: isSelected
-                                          ? Color.fromARGB(255, 64, 41, 148)
-                                          : Colors.grey,
-                                      width: 2,
+                                return GestureDetector(
+                                  onTap: () {
+                                    context
+                                        .read<CountProvider>()
+                                        .setCounterStyle(style["key"]!, index);
+                                    // Navigator.pop(sheetContext);
+                                  },
+                                  child: Container(
+                                    width: 100,
+                                    margin: const EdgeInsets.only(right: 15),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? Color.fromARGB(255, 64, 41, 148)
+                                            : Colors.grey,
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        height:
-                                            60, // Bumped slightly from 40 to give the image more breathing room
-                                        width: 60,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            6,
-                                          ), // Subtle rounding matching your UI style
-                                          child: Image.asset(
-                                            style["image"],
-                                            fit: BoxFit
-                                                .cover, // FIXED: Prevents squishing and layout overflows
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          height:
+                                              50, // Bumped slightly from 40 to give the image more breathing room
+                                          width: 50,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ), // Subtle rounding matching your UI style
+                                            child: Image.asset(
+                                              style["image"],
+                                              fit: BoxFit
+                                                  .cover, // FIXED: Prevents squishing and layout overflows
+                                            ),
                                           ),
                                         ),
-                                      ),
 
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        style["name"]!,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontWeight: isSelected
-                                              ? FontWeight.bold
-                                              : FontWeight.normal,
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          style["name"]!,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontWeight: isSelected
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },

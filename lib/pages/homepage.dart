@@ -1,5 +1,7 @@
+
 import 'package:countify/providers/count_provider.dart';
 import 'package:countify/providers/setting_provider.dart';
+import 'package:countify/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -125,7 +127,7 @@ class _HomepageState extends State<Homepage> {
           "Count list",
           style: GoogleFonts.montserrat(
             textStyle: TextStyle(
-              fontSize: 32,
+              fontSize: 20,
               fontWeight: FontWeight.w900, // Makes it a heavy block
               letterSpacing: -0.5,
             ),
@@ -263,8 +265,9 @@ class _HomepageState extends State<Homepage> {
       body: context.watch<CountProvider>().items.isEmpty
           ? emptyContent
           : ListView.builder(
-              padding: const EdgeInsets.symmetric(
-                vertical: 8,
+              padding: const EdgeInsets.only(
+                top: 8,
+                bottom: 100
               ), // Padding at top and bottom of list
               itemCount: context.watch<CountProvider>().items.length,
               itemBuilder: (context, index) {
@@ -315,13 +318,9 @@ class _HomepageState extends State<Homepage> {
                           arguments: index,
                         );
                       },
-                      tileColor: const Color.fromARGB(
-                        255,
-                        64,
-                        41,
-                        148,
-                      ), // Your beautiful old purple
-                      leading: Text(
+                      tileColor:
+                          AppTheme.brandPurple, // Your beautiful old purple
+                      leading: Text(//the autoSizedText widget needs its parent widget to have a definite size
                         currentItem.value.toString(),
                         style: GoogleFonts.inter(
                           textStyle: TextStyle(
@@ -332,16 +331,13 @@ class _HomepageState extends State<Homepage> {
                             ),
                           ),
                         ),
+                        maxLines: 1,
                       ),
                       title: Row(
                         children: [
                           Expanded(
                             child: Text(
-                              "${currentItem.name}${currentItem.value >= currentItem.maxLimit && currentItem.isMaxAlertEnabled
-                                  ? ": Maximum value reached!"
-                                  : currentItem.value <= currentItem.minLimit && currentItem.isMinAlertEnabled
-                                  ? ": Minimum value reached!"
-                                  : ""}",
+                              currentItem.name,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                               style: const TextStyle(
@@ -397,11 +393,57 @@ class _HomepageState extends State<Homepage> {
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, "/settings");
-        },
-        child: const Icon(Icons.settings),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (context.watch<CountProvider>().items.isNotEmpty)
+            FloatingActionButton(
+              heroTag:
+                  "quickTip_fab", //add a hero tag or set to null if you have more than one floating action button
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text("Quick Tip"),
+                      content: const Text(
+                        "Swipe left on an item to delete it.",
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: TextButton.styleFrom(
+                            backgroundColor: const Color.fromARGB(
+                              255,
+                              64,
+                              41,
+                              148,
+                            ),
+                          ),
+                          child: Text(
+                            "Ok",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const Icon(Icons.lightbulb_outline),
+            ),
+          SizedBox(height: 10),
+          FloatingActionButton(
+            heroTag: "settings_fab",
+            onPressed: () {
+              Navigator.pushNamed(context, "/settings");
+            },
+            child: const Icon(Icons.settings),
+          ),
+        ],
       ),
     );
   }

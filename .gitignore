@@ -54,6 +54,14 @@ app.*.map.json
 key.properties
 google-services.json
 
+
+
+android/key.properties
+*.jks
+*.keystore
+
+
+
 # --- LOCAL CONFIGS ---
 # Local environment variables and secrets
 .env

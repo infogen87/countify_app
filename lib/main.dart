@@ -6,10 +6,21 @@ import 'package:countify/providers/count_provider.dart';
 import 'package:countify/providers/setting_provider.dart';
 import 'package:countify/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.edgeToEdge,
+  ); //so the app pages dont reach the camera nudge
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+    ),
+  );
 
   final settingsProvider = SettingsProvider();
   await settingsProvider.loadSettings();

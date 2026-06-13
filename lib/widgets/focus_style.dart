@@ -4,16 +4,11 @@ import 'package:countify/widgets/count_value_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 class FocusStyle extends StatelessWidget {
   final CounterItem item;
   final int index;
 
-  const FocusStyle({
-    super.key,
-    required this.item,
-    required this.index,
-  });
+  const FocusStyle({super.key, required this.item, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +23,7 @@ class FocusStyle extends StatelessWidget {
 
         return SingleChildScrollView(
           child: Container(
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight,
-            ),
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
             padding: EdgeInsets.all(isSmallScreen ? 16 : 30),
             child: Center(
               child: Column(
@@ -47,7 +40,8 @@ class FocusStyle extends StatelessWidget {
                       const SizedBox(width: 20),
                       CounterButton(
                         icon: Icons.remove,
-                        onTap: () => context.read<CountProvider>().decrementCount(index),
+                        onTap: () =>
+                            context.read<CountProvider>().decrementCount(index),
                         height: smallButtonSize,
                         width: smallButtonSize,
                         isCircular: true,
@@ -60,7 +54,8 @@ class FocusStyle extends StatelessWidget {
                   // Big Plus Button
                   CounterButton(
                     icon: Icons.add,
-                    onTap: () => context.read<CountProvider>().incrementCount(index),
+                    onTap: () =>
+                        context.read<CountProvider>().incrementCount(index),
                     height: bigButtonSize,
                     width: bigButtonSize,
                     isCircular: true,

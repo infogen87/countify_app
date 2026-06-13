@@ -6,12 +6,15 @@ class AppTheme {
   static const Color brushedSteel = Color(0xFF9E9E9E);
   static const Color gunmetal = Color(0xFF263238);
   static const Color industrialCyan = Color(0xFF00ACC1);
-  static const Color gaugeOrange = Color(0xFFFF8F00); // For warnings/limits
+  static const Color brandPurple = Color.fromARGB(255, 64, 41, 148);
+  static const Color alertRed = Color.fromARGB(255, 255, 10, 10);
+  static const double showModalHeaderSize = 19;
+  // static const Color gaugeOrange = Color(0xFFFF8F00); // For warnings/limits
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    primaryColor: gunmetal,
+    // primaryColor: gunmetal,
     scaffoldBackgroundColor: const Color(0xFFF5F5F5), // Light Gray Industrial
     colorScheme: const ColorScheme.light(
       primary: gunmetal,

@@ -28,20 +28,20 @@ class ClassicStyle extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   CounterButton(
-                    icon: Icons.remove,
-                    onTap: () =>
-                        context.read<CountProvider>().decrementCount(index),
-                    height: 120,
-                    width: 120,
-                    isCircular: true
-                  ),
-                  CounterButton(
                     icon: Icons.add,
                     onTap: () =>
                         context.read<CountProvider>().incrementCount(index),
                     height: 120,
                     width: 120,
-                    isCircular: true
+                    isCircular: true,
+                  ),
+                  CounterButton(
+                    icon: Icons.remove,
+                    onTap: () =>
+                        context.read<CountProvider>().decrementCount(index),
+                    height: 120,
+                    width: 120,
+                    isCircular: true,
                   ),
                 ],
               ),
